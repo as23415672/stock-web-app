@@ -1,0 +1,22 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+$bd-violet: $purple;
+
+.navbar {
+  background-color: darkblue;
+}
+
+.nav-bar-button {
+  margin-left: 1%;
+  margin-right: 1%;
+  width: 100%;
+  --bs-btn-color: #{shade-color(white, 20%)};
+  --bs-btn-bg: darkblue;
+  --bs-btn-hover-color: white;
+  --bs-btn-hover-bg: darkblue;
+  --bs-btn-active-color: white;
+  --bs-btn-active-bg: darkblue;
+  --bs-btn-active-border-color: white;
+}
