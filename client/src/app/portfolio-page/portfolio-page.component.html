@@ -1,0 +1,178 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-10">
+      <div class="row justify-content-center" [hidden]="!showTransactionAlert">
+        <div class="col-8" id="alertPlaceholder"></div>
+      </div>
+      <div class="h1 mt-5">My Portfolio</div>
+      <div class="row justify-content-center" [hidden]="!isLoading">
+        <div class="col-8 d-flex justify-content-center mt-5">
+          <mat-spinner diameter="90"> </mat-spinner>
+        </div>
+      </div>
+      <div class="h4 my-2" [hidden]="isLoading">
+        Money in Wallet: ${{ round(currentMoney, 2) }}
+      </div>
+      <div
+        class="alert alert-warning text-center text-dark"
+        role="alert"
+        [hidden]="!showAlert"
+      >
+        Currently you don't have any stock in your watchlist.
+      </div>
+      <div class="row row-cols-1" [hidden]="isLoading">
+        <div class="col" *ngFor="let key of keys">
+          <div class="card my-3">
+            <div class="card-header text-bg-light">
+              <div class="d-flex align-items-end my-2">
+                <div class="fs-3 lh-3 py-1 fw-bold">
+                  {{ profiles.get(key)?.ticker }}
+                </div>
+                <div class="fs-5 ms-3">{{ profiles.get(key)?.name }}</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div
+                class="row row-cols-lg-4 row-cols-2 fs-6 justify-content-between"
+              >
+                <div class="col fw-medium">
+                  <div>Quantity:</div>
+                  <div>Avg. Cost/Share:</div>
+                  <div>Total Cost:</div>
+                </div>
+                <div class="col">
+                  <div>{{ round(portfolio.get(key)!.quantity, 2) }}</div>
+                  <div>
+                    {{
+                      round(
+                        division(
+                          portfolio.get(key)!.totalCost,
+                          portfolio.get(key)!.quantity
+                        ),
+                        2
+                      )
+                    }}
+                  </div>
+                  <div>{{ round(portfolio.get(key)?.totalCost, 2) }}</div>
+                </div>
+                <div
+                  class="col fw-medium"
+                  [ngClass]="{
+                    'text-success':
+                      round(
+                        quotes.get(key)!.c -
+                          division(
+                            portfolio.get(key)!.totalCost,
+                            portfolio.get(key)!.quantity
+                          ),
+                        2
+                      ) > 0,
+                    'text-danger':
+                      round(
+                        quotes.get(key)!.c -
+                          division(
+                            portfolio.get(key)!.totalCost,
+                            portfolio.get(key)!.quantity
+                          ),
+                        2
+                      ) < 0
+                  }"
+                >
+                  <div>Change:</div>
+                  <div>Current Price:</div>
+                  <div>Market Value:</div>
+                </div>
+                <div
+                  class="col"
+                  [ngClass]="{
+                    'text-success':
+                      round(
+                        quotes.get(key)!.c -
+                          division(
+                            portfolio.get(key)!.totalCost,
+                            portfolio.get(key)!.quantity
+                          ),
+                        2
+                      ) > 0,
+                    'text-danger':
+                      round(
+                        quotes.get(key)!.c -
+                          division(
+                            portfolio.get(key)!.totalCost,
+                            portfolio.get(key)!.quantity
+                          ),
+                        2
+                      ) < 0
+                  }"
+                >
+                  <div>
+                    <i
+                      class="bi"
+                      [ngClass]="{
+                        'bi-caret-up-fill':
+                          round(
+                            quotes.get(key)!.c -
+                              division(
+                                portfolio.get(key)!.totalCost,
+                                portfolio.get(key)!.quantity
+                              ),
+                            2
+                          ) > 0,
+                        'bi-caret-down-fill':
+                          round(
+                            quotes.get(key)!.c -
+                              division(
+                                portfolio.get(key)!.totalCost,
+                                portfolio.get(key)!.quantity
+                              ),
+                            2
+                          ) < 0
+                      }"
+                    ></i>
+                    {{
+                      round(
+                        quotes.get(key)!.c -
+                          division(
+                            portfolio.get(key)!.totalCost,
+                            portfolio.get(key)!.quantity
+                          ),
+                        2
+                      )
+                    }}
+                  </div>
+                  <div>{{ round(quotes.get(key)?.c, 2) }}</div>
+                  <div>
+                    {{
+                      round(
+                        portfolio.get(key)!.quantity * quotes.get(key)!.c,
+                        2
+                      )
+                    }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer text-bg-light">
+              <div class="d-flex justify-content-start">
+                <button
+                  class="btn btn-success me-2 px-3"
+                  type="button"
+                  (click)="buyStock(key)"
+                >
+                  Buy
+                </button>
+                <button
+                  class="btn btn-danger ms-2 px-3"
+                  type="button"
+                  (click)="sellStock(key)"
+                >
+                  Sell
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

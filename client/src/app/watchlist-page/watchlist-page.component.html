@@ -1,0 +1,72 @@
+<div class="container-fluid watchlist-container">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-10">
+      <div class="h1 my-5">My WatchList</div>
+      <div
+        class="alert alert-warning text-center text-dark"
+        role="alert"
+        [hidden]="!showAlert"
+      >
+        Currently you don't have any stock in your watchlist.
+      </div>
+      <div class="row justify-content-center" [hidden]="!isLoading">
+        <div class="col-8 d-flex justify-content-center mt-5">
+          <mat-spinner diameter="90"> </mat-spinner>
+        </div>
+      </div>
+      <div class="row row-cols-1" [hidden]="isLoading">
+        <div class="col" *ngFor="let favorite of favorites">
+          <div class="card my-3">
+            <div class="card-body">
+              <button
+                class="btn icon-btn"
+                (click)="removeFromWatchlist(favorite.profile.ticker)"
+              >
+                <i class="bi bi-x"></i>
+              </button>
+              <div class="row row-cols-2" (click)="onClick(favorite.profile.ticker)">
+                <div class="col">
+                  <div class="fs-3 lh-3 my-2 d-flex align-items-center">
+                    {{ favorite.profile.ticker }}
+                  </div>
+                  <div class="fs-5 lh-5 my-4 d-flex align-items-center">
+                    {{ favorite.profile.name }}
+                  </div>
+                </div>
+                <div class="col">
+                  <div
+                    class="fs-3 lh-3 my-2"
+                    [ngClass]="{
+                      'text-success': favorite.quote.d > 0,
+                      'text-danger': favorite.quote.d < 0
+                    }"
+                  >
+                    {{ round(favorite.quote.c, 2) }}
+                  </div>
+                  <div
+                    class="fs-5 lh-5 my-4"
+                    [ngClass]="{
+                    'text-success': favorite.quote.d > 0,
+                    'text-danger': favorite.quote.d < 0,
+                  }"
+                  >
+                    <i
+                      class="bi"
+                      [ngClass]="{
+                      'bi-caret-up-fill': favorite.quote.d > 0,
+                      'bi-caret-down-fill': favorite.quote.d < 0,}
+                    "
+                    ></i>
+                    {{ round(favorite.quote.d, 2) }} ({{
+                      round(favorite.quote.dp, 2)
+                    }}%)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

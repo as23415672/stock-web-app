@@ -1,0 +1,270 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div
+      class="col-8"
+      id="starAlertPlaceholder"
+      [hidden]="!showStarAlert"
+    ></div>
+    <div class="col-8" id="alertPlaceholder" [hidden]="!showAlert"></div>
+  </div>
+  <div class="row justify-content-center" [hidden]="!isLoading">
+    <div class="col-8 d-flex justify-content-center mt-5">
+      <mat-spinner diameter="90"> </mat-spinner>
+    </div>
+  </div>
+  <div class="row justify-content-center mt-5" [hidden]="!showResult">
+    <div class="col-lg-3 col-4 my-2">
+      <div
+        class="text-center fs-1 lh-1 my-2 d-flex align-items-center justify-content-center"
+      >
+        {{ profile.ticker }}
+        <button type="button" class="btn icon-btn" (click)="favorite()">
+          <i
+            class="bi"
+            [ngClass]="{
+              'bi-star': !starred,
+              'bi-star-fill': starred,
+              'text-warning': starred
+            }"
+          ></i>
+        </button>
+      </div>
+      <div class="text-center fs-4 lh-4 my-2 text-secondary">
+        {{ profile.name }}
+      </div>
+      <div class="text-center">
+        {{ profile.exchange }}
+      </div>
+      <div class="d-flex justify-content-center mt-2">
+        <button
+          class="btn btn-success me-2 px-3"
+          type="button"
+          (click)="buyStock(profile.ticker)"
+        >
+          Buy
+        </button>
+        <button
+          class="btn btn-danger ms-2 px-3"
+          type="button"
+          [hidden]="!sellable"
+          (click)="sellStock(profile.ticker)"
+        >
+          Sell
+        </button>
+      </div>
+    </div>
+    <div class="text-center col-2 my-2">
+      <img
+        src="{{ profile.logo }}"
+        alt="logo"
+        class="img-fluid"
+        style="max-height: 7rem"
+      />
+    </div>
+    <div class="col-lg-3 col-4 my-2">
+      <div
+        class="text-center fs-1 lh-1 my-2"
+        [ngClass]="{
+          'text-success': quote.d > 0,
+          'text-danger': quote.d < 0
+        }"
+      >
+        {{ round(quote.c, 2) }}
+      </div>
+      <div
+        class="text-center fs-4 lh-4 my-2"
+        [ngClass]="{
+          'text-success': quote.d > 0,
+          'text-danger': quote.d < 0,
+        }"
+      >
+        <i
+          class="bi"
+          [ngClass]="{
+            'bi-caret-up-fill': quote.d > 0,
+            'bi-caret-down-fill': quote.d < 0,}
+            "
+        ></i>
+        {{ round(quote.d, 2) }} ({{ round(quote.dp, 2) }}%)
+      </div>
+      <div class="text-center">
+        {{ currentTime | date : "yyyy-MM-dd HH:mm:ss" }}
+      </div>
+    </div>
+  </div>
+  <div
+    class="text-center my-3 fw-bold"
+    [hidden]="!showResult"
+    [ngClass]="{
+      'text-success': quote.t * 1000 >= currentTime - 180000,
+      'text-danger': quote.t * 1000 < currentTime - 180000
+    }"
+  >
+    {{
+      quote.t * 1000 < currentTime - 180000
+        ? "Market Closed on "
+        : "Market is Open"
+    }}
+    <span [hidden]="quote.t * 1000 >= currentTime - 180000">{{
+      quote.t * 1000 | date : "yyyy-MM-dd HH:mm:ss"
+    }}</span>
+  </div>
+  <div class="row justify-content-center" [hidden]="!showResult">
+    <div class="col-8">
+      <mat-tab-group>
+        <mat-tab label="Summary">
+          <div class="container-fluid">
+            <div class="row row-cols-1 row-cols-lg-2 mt-3">
+              <div class="col">
+                <div class="row">
+                  <div class="col-lg-6 col-12 mt-4 mb-2">
+                    <div class="text-center my-2">
+                      <span class="fw-bold">High Price</span>:
+                      {{ quote.h }}
+                    </div>
+                    <div class="text-center my-2">
+                      <span class="fw-bold">Low Price</span>: {{ quote.l }}
+                    </div>
+                    <div class="text-center my-2">
+                      <span class="fw-bold">Open Price</span>:
+                      {{ quote.o }}
+                    </div>
+                    <div class="text-center my-2">
+                      <span class="fw-bold">Prev. Close</span>:
+                      {{ quote.pc }}
+                    </div>
+                  </div>
+                  <div class="text-center fs-4 my-4 text-decoration-underline">
+                    About the company
+                  </div>
+                  <div class="text-center my-2">
+                    <span class="fw-bold">IPO Start Date</span>:
+                    {{ profile.ipo }}
+                  </div>
+                  <div class="text-center my-2">
+                    <span class="fw-bold">Industry</span>:
+                    {{ profile.finnhubIndustry }}
+                  </div>
+                  <div class="text-center my-2">
+                    <span class="fw-bold">Webpage</span>:
+                    <a [href]="profile.weburl" target="_blank">{{
+                      profile.weburl
+                    }}</a>
+                  </div>
+                  <div class="text-center my-2 fw-bold">Company Peers:</div>
+                  <div class="text-center my-2">
+                    <button
+                      *ngFor="let peer of peer"
+                      class="btn btn-link"
+                      (click)="triggerSubmit(peer)"
+                    >
+                      {{ peer }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <highcharts-chart
+                  [Highcharts]="Highcharts"
+                  [options]="recentChartOptions"
+                  style="width: 100%; height: auto; display: block"
+                ></highcharts-chart>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Top News">
+          <div class="container-fluid">
+            <div class="row row-cols-1 row-cols-lg-2">
+              <div class="col my-2" *ngFor="let news of news">
+                <div
+                  class="card d-flex justify-content-center h-100 text-bg-light"
+                  (click)="openModal(news)"
+                >
+                  <div class="row w-100 align-items-center g-0">
+                    <div class="col-4 p-3">
+                      <div class="row justify-content-center">
+                        <img
+                          [src]="news.image"
+                          class="img-fluid"
+                          style="max-height: 7rem; width: auto"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-8 text-center card-body">
+                      {{ news.headline }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Charts">
+          <highcharts-chart
+            [Highcharts]="Highcharts"
+            [options]="historicalChartOptions!"
+            constructorType="stockChart"
+            style="width: 100%; height: 40rem; display: block"
+          ></highcharts-chart>
+          <script>
+            console.log(historyChartOptions);
+          </script>
+        </mat-tab>
+        <mat-tab label="Insights">
+          <div class="container-fluid">
+            <div class="row text-center">
+              <div class="h3">Insider Sentiments</div>
+            </div>
+            <div class="row justify-content-center">
+              <div class="col-lg-6 col-12 justify-content-center">
+                <table class="table align-middle text-center">
+                  <thead>
+                    <tr>
+                      <th scope="col">{{ profile.name }}</th>
+                      <th scope="col">MSPR</th>
+                      <th scope="col">Change</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Total</th>
+                      <td>{{ round(insider.mspr.total, 2) }}</td>
+                      <td>{{ insider.change.total }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Positive</th>
+                      <td>{{ round(insider.mspr.positive, 2) }}</td>
+                      <td>{{ insider.change.positive }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Negative</th>
+                      <td>{{ round(insider.mspr.negative, 2) }}</td>
+                      <td>{{ insider.change.negative }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row row-cols-lg-2">
+              <div class="col">
+                <highcharts-chart
+                  [Highcharts]="Highcharts"
+                  [options]="recommendationChartOptions"
+                  style="width: 100%; height: auto; display: block"
+                ></highcharts-chart>
+              </div>
+              <div class="col">
+                <highcharts-chart
+                  [Highcharts]="Highcharts"
+                  [options]="epsChartOptions"
+                  style="width: 100%; height: auto; display: block"
+                ></highcharts-chart>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</div>

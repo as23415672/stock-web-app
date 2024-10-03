@@ -1,0 +1,47 @@
+<div class="container-fluid">
+  <div
+    class="row d-flex justify-content-center fs-2 search-box-title pt-5 pb-2"
+  >
+    STOCK SEARCH
+  </div>
+  <div class="row d-flex justify-content-center py-2">
+    <div class="col-md-2 col-8">
+      <form
+        class="input-group mb-3 rounded-start-pill rounded-end-pill custom-input-container"
+        (ngSubmit)="onSubmit(searchTerm.value!)"
+      >
+        <input
+          type="text"
+          class="form-control custom-input"
+          placeholder="Enter stock ticker symbol"
+          [formControl]="searchTerm"
+          [matAutocomplete]="search"
+        />
+        <button class="btn custom-button" type="submit" id="button-addon2">
+          <i class="bi bi-search"></i>
+        </button>
+        <button
+          class="btn custom-button rounded-end-pill"
+          type="button"
+          id="button-addon2"
+          (click)="clear()"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<mat-autocomplete #search="matAutocomplete">
+  @for (option of autoCompleteOptions; track option) {
+  <mat-option
+    [value]="option.symbol"
+    (onSelectionChange)="onSubmit(searchTerm.value!)"
+    >{{ option.symbol }} | {{ option.description }}</mat-option
+  >
+  }
+  <mat-option *ngIf="isLoading">
+    <mat-spinner diameter="30" matSuffix></mat-spinner
+  ></mat-option>
+</mat-autocomplete>
